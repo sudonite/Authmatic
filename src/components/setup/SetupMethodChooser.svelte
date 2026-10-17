@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { SetupMethodView } from "@/state/app-state.svelte";
-  import { ChevronRight, QrCode, KeyRound } from "lucide-svelte";
+  import type { View } from "@/state/app-state.svelte";
+  import { ChevronRight, QrCode, KeyRound } from "@lucide/svelte";
 
   interface Props {
-    handleSubmit(view: SetupMethodView): void;
+    handleSubmit(view: View): void;
   }
 
   let { handleSubmit }: Props = $props();

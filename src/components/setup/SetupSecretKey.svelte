@@ -5,8 +5,8 @@
     KeyRound,
     Link2,
     Smartphone,
-  } from "lucide-svelte";
-  import { extractSecretFromInput } from "@/services/topt-service";
+  } from "@lucide/svelte";
+  import { extractSecretFromInput } from "@/services/totp-service";
 
   interface Props {
     handleSubmit: (secretKey: string) => void;

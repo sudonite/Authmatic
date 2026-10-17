@@ -6,8 +6,8 @@
     ImageUp,
     ScanLine,
     X,
-  } from "lucide-svelte";
-  import { extractSecretFromQRCode } from "@/services/topt-service";
+  } from "@lucide/svelte";
+  import { extractSecretFromQRCode } from "@/services/totp-service";
 
   let qrFile = $state<File | null>(null);
   let isProcessing = $state(false);

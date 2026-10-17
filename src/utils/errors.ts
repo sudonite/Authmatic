@@ -14,7 +14,7 @@ const captureError = (source: CapturedError["source"], err: unknown): void => {
     app.currentView = "error";
 };
 
-const installErrorHandlers = (): void => {
+const initializeErrorHandlers = (): void => {
     window.addEventListener("error", (event) => {
         captureError("uncaught", event.error ?? event.message);
     });
@@ -24,4 +24,4 @@ const installErrorHandlers = (): void => {
     });
 };
 
-export { installErrorHandlers };
+export { initializeErrorHandlers };

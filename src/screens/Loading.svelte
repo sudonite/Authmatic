@@ -1,58 +1,53 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { KeyRound, ShieldCheck } from "lucide-svelte";
+  import { KeyRound, ShieldCheck } from "@lucide/svelte";
   import AuroraText from "@/components/AuroraText.svelte";
   import SparklesText from "@/components/SparklesText.svelte";
-  import { app } from "@/state/app-state.svelte";
+  import { initializeApp, type View } from "@/state/app-state.svelte";
   import { initializeUser } from "@/state/user-state.svelte";
+  import { initializeErrorHandlers } from "@/utils/errors";
 
-  const BOOT_STEP_MS = 300;
-  const READY_HOLD_MS = 500;
+  interface Props {
+    handleViewChange: (view: View) => void;
+  }
 
-  const BOOT_STEPS = [
-    { id: "init", label: "Initializing application" },
-    { id: "service", label: "Starting background services" },
-    { id: "account", label: "Checking account state" },
+  let { handleViewChange }: Props = $props();
+
+  const steps = [
+    "Initializing application",
+    "Starting background services",
+    "Checking account state",
   ] as const;
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-
   let completedSteps = $state(0);
-
   const progressValue = $derived(
-    Math.round((completedSteps / BOOT_STEPS.length) * 100),
+    Math.round((completedSteps / steps.length) * 100),
   );
-  const isReady = $derived(completedSteps >= BOOT_STEPS.length);
+  const isReady = $derived(completedSteps >= steps.length);
 
   onMount(() => {
-    const timers: number[] = [];
+    initializeErrorHandlers();
 
-    installErrorHandlers();
+    async function init() {
+      const [user] = await Promise.all([initializeUser(), initializeApp()]);
 
-    const userReady = initializeUser();
-
-    timers.push(
-      window.setTimeout(
-        async () => {
-          const user = await userReady;
-          app.currentView = user ? "dashboard" : "setup-credentials";
-        },
-        BOOT_STEP_MS * BOOT_STEPS.length + READY_HOLD_MS,
-      ),
-    );
-
-    BOOT_STEPS.forEach((_, index) => {
-      timers.push(
-        window.setTimeout(
-          () => (completedSteps = index + 1),
-          BOOT_STEP_MS * (index + 1),
-        ),
-      );
-    });
-
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
+      if (user) {
+        for (let i = 0; i < steps.length; i++) {
+          await new Promise((r) => setTimeout(r, 500));
+          completedSteps = i + 1;
+        }
+        await new Promise((r) => setTimeout(r, 1000));
+        handleViewChange("dashboard");
+      } else {
+        for (let i = 0; i < steps.length; i++) {
+          await new Promise((r) => setTimeout(r, 500));
+          completedSteps = i + 1;
+        }
+        await new Promise((r) => setTimeout(r, 1000));
+        handleViewChange("setup-credentials");
+      }
+    }
+    init();
   });
 </script>
 
@@ -64,7 +59,7 @@
       <KeyRound size={26} />
     </div>
     <SparklesText
-      sparklesCount={prefersReducedMotion ? 0 : 3}
+      sparklesCount={3}
       colors={{
         first: "var(--color-primary)",
         second: "var(--color-secondary)",
@@ -113,7 +108,7 @@
     </div>
 
     <ul class="mt-2 flex flex-col gap-1">
-      {#each BOOT_STEPS as step, index (step.id)}
+      {#each steps as label, index}
         {@const isDone = completedSteps > index}
         <li
           class="flex items-center gap-2 font-mono text-[11px] {isDone
@@ -123,7 +118,7 @@
           <span class="text-base-content/40">
             [{String(index + 1).padStart(2, "0")}]
           </span>
-          <span class="flex-1 truncate">{step.label}</span>
+          <span class="flex-1 truncate">{label}</span>
           <span class={isDone ? "text-success" : ""}>
             {isDone ? "ok" : "…"}
           </span>
@@ -131,7 +126,10 @@
       {/each}
     </ul>
 
-    <progress class="progress mt-2.5 w-full" value={progressValue} max={100}
+    <progress
+      class="progress mt-2.5 w-full transition-all duration-75"
+      value={progressValue}
+      max={100}
     ></progress>
     <div
       class="mt-1 flex justify-between font-mono text-[10px] tabular-nums text-base-content/50"

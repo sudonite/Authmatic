@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { ChevronRight, Eye, EyeOff, FingerprintPattern } from "lucide-svelte";
+  import {
+    ChevronRight,
+    Eye,
+    EyeOff,
+    FingerprintPattern,
+  } from "@lucide/svelte";
 
   interface Props {
     handleSubmit: (neptunCode: string, password: string) => void;

@@ -1,40 +1,42 @@
 <script lang="ts">
-  import { ChevronRight } from "lucide-svelte";
+  import { ChevronRight } from "@lucide/svelte";
   import SparklesText from "./SparklesText.svelte";
   import AuroraText from "./AuroraText.svelte";
-  import { app } from "@/state/app-state.svelte";
+  import type { View } from "@/state/app-state.svelte";
+
+  interface Props {
+    currentView: View;
+    handleViewChange: (view: View) => void;
+  }
+
+  let { handleViewChange, currentView }: Props = $props();
 
   let showBack = $derived(
     () =>
-      app.currentView === "setup-method" ||
-      app.currentView === "setup-qrcode" ||
-      app.currentView === "setup-secretkey" ||
-      app.currentView === "show-qrcode" ||
-      app.currentView === "show-secretkey" ||
-      app.currentView === "settings" ||
-      app.currentView === "themes",
+      currentView === "setup-method" ||
+      currentView === "setup-qrcode" ||
+      currentView === "setup-secretkey" ||
+      currentView === "show-qrcode" ||
+      currentView === "show-secretkey" ||
+      currentView === "settings" ||
+      currentView === "themes",
   );
 
   const handleBack = () => {
-    switch (app.currentView) {
-      case "setup-method":
-        app.currentView = "setup-credentials";
-        break;
-
-      case "setup-qrcode":
-      case "setup-secretkey":
-        app.currentView = "setup-method";
-        break;
-
-      case "show-qrcode":
-      case "show-secretkey":
-        app.currentView = "settings";
-        break;
-
-      case "settings":
-      case "themes":
-        app.currentView = "dashboard";
-        break;
+    if (currentView === "setup-method") {
+      handleViewChange("setup-credentials");
+    } else if (
+      currentView === "setup-qrcode" ||
+      currentView === "setup-secretkey"
+    ) {
+      handleViewChange("setup-method");
+    } else if (
+      currentView === "show-qrcode" ||
+      currentView === "show-secretkey"
+    ) {
+      handleViewChange("settings");
+    } else if (currentView === "settings" || currentView === "themes") {
+      handleViewChange("dashboard");
     }
   };
 </script>

@@ -7,7 +7,10 @@ import {
 
 let user = $state.raw<User | null>(null);
 
-function getUser(): User | null {
+function getUser(): User {
+  if (!user) {
+    throw new Error("User is not initialized");
+  }
   return user;
 }
 

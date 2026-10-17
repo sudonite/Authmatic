@@ -11,6 +11,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
-    permissions: ['storage'],
+    permissions: ['storage', 'downloads'],
   },
 });

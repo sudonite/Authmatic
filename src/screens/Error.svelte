@@ -1,11 +1,16 @@
 <script lang="ts">
-  import { Copy, RotateCcw, TriangleAlert } from "lucide-svelte";
-  import { app } from "@/state/app-state.svelte";
-  import type { CapturedError } from "@/state/app-state.svelte";
+  import { Copy, RotateCcw, TriangleAlert } from "@lucide/svelte";
+  import type { CapturedError, View } from "@/state/app-state.svelte";
+
+  interface Props {
+    error: CapturedError | null;
+    handleViewChange: (view: View) => void;
+    handleReset: () => void;
+  }
+
+  let { error = $bindable(), handleViewChange, handleReset }: Props = $props();
 
   let copied = $state(false);
-
-  let error = $derived(app.error);
 
   const faultCode = (input: string): string => {
     let hash = 5381;
@@ -34,8 +39,8 @@
   };
 
   const handleReload = () => {
-    app.error = null;
-    app.currentView = "loading";
+    error = null;
+    handleViewChange("loading");
   };
 
   const formatFaultReport = (error: CapturedError): string =>
@@ -134,6 +139,10 @@
     <button class="btn btn-error btn-sm flex-1" onclick={handleReload}>
       <RotateCcw size={14} />
       Reload
+    </button>
+    <button class="btn btn-error btn-sm flex-1" onclick={handleReset}>
+      <TriangleAlert size={14} />
+      Delete all data
     </button>
   </div>
 </div>

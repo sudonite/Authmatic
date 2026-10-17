@@ -1,12 +1,18 @@
 <script lang="ts">
-  import { app } from "@/state/app-state.svelte";
-  import type { SetupMethodView } from "@/state/app-state.svelte";
+  import type { View } from "@/state/app-state.svelte";
   import type { User } from "@/state/user-state.svelte";
   import SetupCredentials from "@/components/setup/SetupCredentials.svelte";
   import SetupMethodChooser from "@/components/setup/SetupMethodChooser.svelte";
   import SetupQRCode from "@/components/setup/SetupQRCode.svelte";
   import SetupSecretKey from "@/components/setup/SetupSecretKey.svelte";
-import { persistUser } from "@/state/user-state.svelte";
+  import { persistUser } from "@/state/user-state.svelte";
+
+  interface Props {
+    currentView: View;
+    handleViewChange: (view: View) => void;
+  }
+
+  let { currentView, handleViewChange }: Props = $props();
 
   let setupUser: User = $state({
     neptunCode: "",
@@ -17,16 +23,15 @@ import { persistUser } from "@/state/user-state.svelte";
   const handleSubmitCredentials = (neptunCode: string, password: string) => {
     setupUser.neptunCode = neptunCode;
     setupUser.password = password;
-    app.currentView = "setup-method";
+    handleViewChange("setup-method");
   };
 
-  const handleSubmitMethod = (method: SetupMethodView) =>
-    (app.currentView = method);
+  const handleSubmitMethod = (method: View) => handleViewChange(method);
 
   const handleSubmitSecretKey = (secretKey: string) => {
     setupUser.secretKey = secretKey;
     void persistUser({ ...setupUser });
-    app.currentView = "dashboard";
+    handleViewChange("dashboard");
   };
 
   $inspect(setupUser, "setupUser");
@@ -37,13 +42,13 @@ import { persistUser } from "@/state/user-state.svelte";
 >
   <div class="card flex min-h-0 flex-1 flex-col bg-base-200 shadow-lg">
     <div class="card-body flex min-h-0 flex-1 flex-col p-5">
-      {#if app.currentView === "setup-credentials"}
+      {#if currentView === "setup-credentials"}
         <SetupCredentials handleSubmit={handleSubmitCredentials} />
-      {:else if app.currentView === "setup-method"}
+      {:else if currentView === "setup-method"}
         <SetupMethodChooser handleSubmit={handleSubmitMethod} />
-      {:else if app.currentView === "setup-qrcode"}
+      {:else if currentView === "setup-qrcode"}
         <SetupQRCode handleSubmit={handleSubmitSecretKey} />
-      {:else if app.currentView === "setup-secretkey"}
+      {:else if currentView === "setup-secretkey"}
         <SetupSecretKey handleSubmit={handleSubmitSecretKey} />
       {/if}
     </div>
