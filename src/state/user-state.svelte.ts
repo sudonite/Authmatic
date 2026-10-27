@@ -2,7 +2,15 @@ import {
   loadUser,
   saveUser,
   clearUser,
+  loadSetupDraft,
+  saveSetupDraft,
+  clearSetupDraft,
+  loadSetupQrImage,
+  saveSetupQrImage,
+  clearSetupQrImage,
   type User,
+  type SetupDraft,
+  type StoredQrImage,
 } from "@/storage/user-repository";
 
 let user = $state.raw<User | null>(null);
@@ -21,13 +29,28 @@ async function initializeUser(): Promise<User | null> {
 
 async function persistUser(next: User): Promise<void> {
   user = next;
-  await saveUser(next);
+  // Setup is complete: the in-progress draft and image are no longer needed.
+  await Promise.all([
+    saveUser(next),
+    clearSetupDraft(),
+    clearSetupQrImage(),
+  ]);
 }
 
 async function resetUser(): Promise<void> {
   user = null;
-  await clearUser();
+  await Promise.all([clearUser(), clearSetupDraft(), clearSetupQrImage()]);
 }
 
-export { getUser, initializeUser, persistUser, resetUser };
-export type { User };
+export {
+  getUser,
+  initializeUser,
+  persistUser,
+  resetUser,
+  loadSetupDraft,
+  saveSetupDraft,
+  loadSetupQrImage,
+  saveSetupQrImage,
+  clearSetupQrImage,
+};
+export type { SetupDraft, StoredQrImage, User };

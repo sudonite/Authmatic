@@ -6,7 +6,6 @@
   import { initializeApp, type View } from "@/state/app-state.svelte";
   import { initializeUser } from "@/state/user-state.svelte";
   import { initializeErrorHandlers } from "@/utils/errors";
-
   interface Props {
     handleViewChange: (view: View) => void;
   }
@@ -29,21 +28,22 @@
     initializeErrorHandlers();
 
     async function init() {
-      const [user] = await Promise.all([initializeUser(), initializeApp()]);
+      const [user, restoredSetupView] = await Promise.all([
+        initializeUser(),
+        initializeApp(),
+      ]);
 
       if (user) {
-        for (let i = 0; i < steps.length; i++) {
-          await new Promise((r) => setTimeout(r, 500));
-          completedSteps = i + 1;
-        }
-        await new Promise((r) => setTimeout(r, 1000));
         handleViewChange("dashboard");
+      } else if (restoredSetupView) {
+        handleViewChange(restoredSetupView);
       } else {
         for (let i = 0; i < steps.length; i++) {
           await new Promise((r) => setTimeout(r, 500));
           completedSteps = i + 1;
         }
         await new Promise((r) => setTimeout(r, 1000));
+
         handleViewChange("setup-credentials");
       }
     }

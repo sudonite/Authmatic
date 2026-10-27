@@ -1,12 +1,18 @@
-import { clearApp, loadApp, saveApp } from "@/storage/app-repository";
+import {
+  clearApp,
+  loadApp,
+  saveApp,
+  SETUP_VIEWS,
+  type SetupView,
+} from "@/storage/app-repository";
 import { themes, DEFAULT_THEME, applyTheme } from "@/utils/themes";
 
 type App = {
-  currentView: View
-  autoLogin: boolean
-  error: CapturedError | null
-  theme: string
-}
+  currentView: View;
+  autoLogin: boolean;
+  error: CapturedError | null;
+  theme: string;
+};
 
 type View =
   | "loading"
@@ -36,7 +42,40 @@ const app: App = $state({
   theme: DEFAULT_THEME,
 });
 
-async function initializeApp(): Promise<void> {
+function isSetupView(value: unknown): value is SetupView {
+  return (SETUP_VIEWS as readonly unknown[]).includes(value);
+}
+
+// All storage writes run through this queue so rapid navigations cannot
+// persist out of order.
+let persistQueue: Promise<void> = Promise.resolve();
+
+function enqueuePersist(
+  action: () => Promise<void>,
+  failureMessage: string,
+): Promise<void> {
+  persistQueue = persistQueue
+    .then(action)
+    .catch((error) => {
+      console.error(failureMessage, error);
+    });
+
+  return persistQueue;
+}
+
+function queuePersist(): Promise<void> {
+  return enqueuePersist(
+    () =>
+      saveApp({
+        autoLogin: app.autoLogin,
+        theme: app.theme,
+        setupView: isSetupView(app.currentView) ? app.currentView : null,
+      }),
+    "Failed to save app settings:",
+  );
+}
+
+async function initializeApp(): Promise<View | null> {
   const stored = await loadApp();
 
   app.theme =
@@ -44,7 +83,16 @@ async function initializeApp(): Promise<void> {
       ? stored.theme
       : DEFAULT_THEME;
 
+  app.autoLogin = stored?.autoLogin ?? true;
+
   applyTheme(app.theme);
+
+  return stored && isSetupView(stored.setupView) ? stored.setupView : null;
+}
+
+function setView(view: View): void {
+  app.currentView = view;
+  void queuePersist();
 }
 
 async function setTheme(theme: string): Promise<void> {
@@ -54,12 +102,12 @@ async function setTheme(theme: string): Promise<void> {
 
   app.theme = theme;
   applyTheme(theme);
-  await saveApp({ autoLogin: app.autoLogin, theme });
+  await queuePersist();
 }
 
 async function setAutoLogin(autoLogin: boolean): Promise<void> {
   app.autoLogin = autoLogin;
-  await saveApp({ autoLogin, theme: app.theme });
+  await queuePersist();
 }
 
 async function resetApp(): Promise<void> {
@@ -67,8 +115,9 @@ async function resetApp(): Promise<void> {
   app.autoLogin = true;
   app.error = null;
   app.theme = DEFAULT_THEME;
-  await clearApp();
+  // Chained behind queued saves so no pending write resurrects data.
+  await enqueuePersist(clearApp, "Failed to clear app settings:");
 }
 
-export { app, initializeApp, setTheme, setAutoLogin, resetApp };
+export { app, initializeApp, setView, setTheme, setAutoLogin, resetApp };
 export type { App, CapturedError, View };

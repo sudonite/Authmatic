@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { app, resetApp, setTheme } from "@/state/app-state.svelte";
+  import {
+    app,
+    resetApp,
+    setAutoLogin,
+    setTheme,
+    setView,
+  } from "@/state/app-state.svelte";
   import type { View } from "@/state/app-state.svelte";
   import { getUser, resetUser } from "@/state/user-state.svelte";
   import AppBar from "@/components/AppBar.svelte";
@@ -19,12 +25,11 @@
 
   let neptunCode = $derived(getUser().neptunCode);
 
-  $inspect(app.currentView, (view: View) => {
-    console.log("Current view changed to:", view);
-  });
-
-  const handleViewChange = (view: View) => (app.currentView = view);
+  const handleViewChange = (view: View) => setView(view);
   const handleThemeChange = (theme: string) => setTheme(theme);
+  const handleAutoLoginChange = (value: boolean) => {
+    void setAutoLogin(value);
+  };
   const handleReset = () => {
     resetUser();
     resetApp();
@@ -47,7 +52,12 @@
         {#if currentView.startsWith("setup-")}
           <Setup {currentView} {handleViewChange} />
         {:else if currentView === "dashboard"}
-          <Dashboard bind:autoLogin {neptunCode} {handleViewChange} />
+          <Dashboard
+            {neptunCode}
+            {autoLogin}
+            {handleViewChange}
+            {handleAutoLoginChange}
+          />
         {:else if currentView === "themes"}
           <Themes {currentTheme} {handleThemeChange} />
         {:else if currentView === "settings"}

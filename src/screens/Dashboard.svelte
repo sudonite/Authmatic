@@ -24,17 +24,20 @@
     autoLogin: boolean;
     neptunCode: string;
     handleViewChange: (view: View) => void;
+    handleAutoLoginChange: (autoLogin: boolean) => void;
   }
 
   let {
     neptunCode,
-    autoLogin = $bindable(true),
+    autoLogin,
     handleViewChange,
+    handleAutoLoginChange,
   }: Props = $props();
 
   let otpCode = $state("");
   let otpSecondsLeft = $state(OTP_PERIOD_SECONDS);
   let otpPeriodSeconds = $state(OTP_PERIOD_SECONDS);
+  let otpReady = $state(false);
   let lockOtp = $state(false);
   let copied = $state(false);
   let copyResetId: number | undefined;
@@ -60,6 +63,7 @@
       otpCode = state.code;
       otpSecondsLeft = state.secondsLeft;
       otpPeriodSeconds = state.periodSeconds;
+      otpReady = true;
     };
 
     void tick();
@@ -111,7 +115,7 @@
     </button>
     <button
       class={`btn btn-sm btn-square rounded-xl ${autoLogin ? "btn-success" : "btn-error"}`}
-      onclick={() => (autoLogin = !autoLogin)}
+      onclick={() => handleAutoLoginChange(!autoLogin)}
       aria-label="Auto Login"
     >
       {#if autoLogin}
@@ -182,8 +186,12 @@
 
   <div class="w-full bg-base-300 rounded-full h-1.5 mb-4 mt-2">
     <div
-      class="bg-base-content h-1.5 rounded-full transition-[width] duration-1000 ease-linear"
-      style="width: {(otpSecondsLeft / otpPeriodSeconds) * 100}%"
+      class="bg-base-content h-1.5 rounded-full {otpReady
+        ? 'transition-[width] duration-1000 ease-linear'
+        : ''}"
+      style="width: {otpReady
+        ? (otpSecondsLeft / otpPeriodSeconds) * 100
+        : 0}%"
     ></div>
   </div>
 

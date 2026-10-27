@@ -5,6 +5,40 @@ import { browser } from "wxt/browser";
 const QR_SCALE = 8;
 const QR_MARGIN = 4;
 
+export function readImageAsDataUrl(file: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            if (typeof reader.result === "string") {
+                resolve(reader.result);
+            } else {
+                reject(new Error("Failed to read the image."));
+            }
+        };
+
+        reader.onerror = () =>
+            reject(reader.error ?? new Error("Failed to read the image."));
+
+        reader.readAsDataURL(file);
+    });
+}
+
+export async function dataUrlToFile(
+    dataUrl: string,
+    name: string,
+): Promise<File> {
+    const response = await fetch(dataUrl);
+
+    if (!response.ok) {
+        throw new Error("Failed to read the stored image.");
+    }
+
+    const blob = await response.blob();
+
+    return new File([blob], name, { type: blob.type });
+}
+
 export async function downloadQRCodePng(value: string, filename = "qrcode.png"): Promise<void> {
     const qr = qrcode(0, "M");
     qr.addData(value);
