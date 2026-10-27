@@ -4,16 +4,23 @@ const USERNAME_SELECTOR = "#userName";
 const PASSWORD_SELECTOR = "#password-form-password";
 const TWO_FACTOR_INPUT_SELECTOR = "#two-factor-qr-code-input-form-input";
 
+const LOGIN_PATH = "/hallgato_ng/login";
+const LOGIN_CHECK_INTERVAL_MS = 500;
+
 const ELEMENT_TIMEOUT_MS = 15_000;
 const BUTTON_TIMEOUT_MS = 5_000;
 
 export default defineContentScript({
-  matches: ["https://neptun-hweb.sze.hu/hallgato_ng/login*"],
+  // Neptun is a single-page app: unauthenticated visits to any of its pages
+  // are redirected to the login page client-side, without a new page load,
+  // so the script must run everywhere to catch that redirect.
+  matches: ["https://neptun-hweb.sze.hu/*"],
 
   runAt: "document_idle",
 
   async main() {
     try {
+      await waitForLoginPage();
       await performLogin();
     } catch (error) {
       // Only messages are logged; credentials and codes never are.
@@ -24,6 +31,32 @@ export default defineContentScript({
     }
   },
 });
+
+function isOnLoginPage(): boolean {
+  const path = window.location.pathname.replace(/\/+$/, "");
+
+  return path === LOGIN_PATH;
+}
+
+function waitForLoginPage(): Promise<void> {
+  if (isOnLoginPage()) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve) => {
+    // SPA route changes run in the page's JS context and cannot be observed
+    // from the content script, so the URL is polled until it settles on the
+    // login page.
+    const timer = window.setInterval(() => {
+      if (!isOnLoginPage()) {
+        return;
+      }
+
+      window.clearInterval(timer);
+      resolve();
+    }, LOGIN_CHECK_INTERVAL_MS);
+  });
+}
 
 async function performLogin(): Promise<void> {
   const credentials = await sendExtensionMessage({
