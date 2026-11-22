@@ -1,6 +1,7 @@
-# WXT + Svelte
+# Authmatic
 
-This template should help get you started developing with Svelte in WXT.
+Authmatic is a browser extension that stores and generates one-time passwords
+for Neptun accounts.
 
 ## Recommended IDE Setup
 

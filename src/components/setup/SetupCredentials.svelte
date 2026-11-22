@@ -22,7 +22,7 @@
     <div
       class="w-14 h-14 rounded-2xl bg-base-300 flex items-center justify-center mx-auto mb-3"
     >
-      <FingerprintPattern size={28} class={"text-base-content/60"} />
+      <FingerprintPattern size={28} class="text-base-content/60" />
     </div>
   </div>
   <p class="text-xs text-base-content/60 mt-1">
@@ -55,18 +55,30 @@
           required
           minlength="6"
         />
-        <button
-          type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle"
-          onclick={() => (showPassword = !showPassword)}
-          aria-label={showPassword ? "Hide password" : "Show password"}
-        >
-          {#if showPassword}
-            <EyeOff size={16} />
-          {:else}
-            <Eye size={16} />
-          {/if}
-        </button>
+        <div class="absolute right-2 top-1/2 -translate-y-1/2">
+          <div class="tooltip tooltip-left">
+            <button
+              type="button"
+              class="btn btn-ghost btn-xs btn-circle"
+              onclick={() => (showPassword = !showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-describedby="setup-password-tooltip"
+            >
+              {#if showPassword}
+                <EyeOff size={16} />
+              {:else}
+                <Eye size={16} />
+              {/if}
+            </button>
+            <span
+              id="setup-password-tooltip"
+              class="tooltip-content"
+              role="tooltip"
+            >
+              {showPassword ? "Hide password" : "Show password"}
+            </span>
+          </div>
+        </div>
       </div>
     </label>
     <p class="validator-hint hidden">Must be at least 6 characters</p>

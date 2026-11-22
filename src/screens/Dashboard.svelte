@@ -78,14 +78,24 @@
 
 <div class="flex flex-row mb-5 card bg-base-300 shadow-lg p-2 items-stretch">
   <div class="avatar avatar-placeholder flex items-center">
-    <button
-      onclick={() => handleViewChange("settings")}
-      class="btn btn-primary btn-circle rounded-xl flex items-center justify-center hover:bg-primary/50 hover:cursor-pointer group relative"
-      aria-label="Settings"
-    >
-      <Crown class="block group-hover:hidden transition-all" />
-      <UserCog class="hidden group-hover:block transition-all" />
-    </button>
+    <span class="tooltip tooltip-bottom">
+      <button
+        onclick={() => handleViewChange("settings")}
+        class="btn btn-primary btn-circle rounded-xl flex items-center justify-center hover:bg-primary/50 hover:cursor-pointer group relative"
+        aria-label="Settings"
+        aria-describedby="dashboard-settings-tooltip"
+      >
+        <Crown class="block group-hover:hidden transition-all" />
+        <UserCog class="hidden group-hover:block transition-all" />
+      </button>
+      <span
+        id="dashboard-settings-tooltip"
+        class="tooltip-content"
+        role="tooltip"
+      >
+        Settings
+      </span>
+    </span>
   </div>
 
   <div class="flex-1 ml-4 flex items-stretch">
@@ -100,37 +110,77 @@
     </div>
   </div>
   <div class="flex items-center space-x-2">
-    <button
-      class="btn btn-info btn-sm btn-square rounded-xl"
-      onclick={() => window.open(neptunURL, "_blank")}
-      aria-label="Open Neptun"
-    >
-      <Globe size={18} />
-    </button>
-    <button
-      class="btn btn-secondary btn-sm btn-square rounded-xl"
-      aria-label="Mark as seen messages"
-    >
-      <BroomSparkles size={18} />
-    </button>
-    <button
-      class={`btn btn-sm btn-square rounded-xl ${autoLogin ? "btn-success" : "btn-error"}`}
-      onclick={() => handleAutoLoginChange(!autoLogin)}
-      aria-label="Auto Login"
-    >
-      {#if autoLogin}
-        <Bot size={18} class="text-base-content" />
-      {:else}
-        <BotOff size={18} class="text-base-content" />
-      {/if}
-    </button>
-    <button
-      class="btn btn-accent btn-sm btn-square rounded-xl"
-      onclick={() => handleViewChange("themes")}
-      aria-label="Themes"
-    >
-      <Palette size={18} />
-    </button>
+    <div class="tooltip tooltip-bottom">
+      <button
+        class="btn btn-info btn-sm btn-square rounded-xl"
+        onclick={() => window.open(neptunURL, "_blank")}
+        aria-label="Open Neptun"
+        aria-describedby="dashboard-neptun-tooltip"
+      >
+        <Globe size={18} />
+      </button>
+      <span
+        id="dashboard-neptun-tooltip"
+        class="tooltip-content"
+        role="tooltip"
+      >
+        Open Neptun
+      </span>
+    </div>
+    <div class="tooltip tooltip-bottom">
+      <button
+        class="btn btn-secondary btn-sm btn-square rounded-xl"
+        aria-label="Mark as seen messages"
+        aria-describedby="dashboard-messages-tooltip"
+      >
+        <BroomSparkles size={18} />
+      </button>
+      <span
+        id="dashboard-messages-tooltip"
+        class="tooltip-content"
+        role="tooltip"
+      >
+        Mark as seen messages
+      </span>
+    </div>
+    <div class="tooltip tooltip-bottom">
+      <button
+        class={`btn btn-sm btn-square rounded-xl ${autoLogin ? "btn-success" : "btn-error"}`}
+        onclick={() => handleAutoLoginChange(!autoLogin)}
+        aria-label="Auto Login"
+        aria-describedby="dashboard-auto-login-tooltip"
+      >
+        {#if autoLogin}
+          <Bot size={18} class="text-base-content" />
+        {:else}
+          <BotOff size={18} class="text-base-content" />
+        {/if}
+      </button>
+      <span
+        id="dashboard-auto-login-tooltip"
+        class="tooltip-content"
+        role="tooltip"
+      >
+        Auto Login
+      </span>
+    </div>
+    <div class="tooltip tooltip-bottom">
+      <button
+        class="btn btn-accent btn-sm btn-square rounded-xl"
+        onclick={() => handleViewChange("themes")}
+        aria-label="Themes"
+        aria-describedby="dashboard-themes-tooltip"
+      >
+        <Palette size={18} />
+      </button>
+      <span
+        id="dashboard-themes-tooltip"
+        class="tooltip-content"
+        role="tooltip"
+      >
+        Themes
+      </span>
+    </div>
   </div>
 </div>
 <div class="card card-body bg-base-300 shadow-lg">

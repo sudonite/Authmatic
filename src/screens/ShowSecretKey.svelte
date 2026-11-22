@@ -59,18 +59,28 @@
             Neptun · {neptunCode}
           </p>
         </div>
-        <button
-          class="btn btn-circle btn-sm bg-white/20 border-none text-secondary-content hover:bg-white/30"
-          aria-label={revealed ? "Hide secret key" : "Reveal secret key"}
-          aria-pressed={revealed}
-          onclick={() => (revealed = !revealed)}
-        >
-          {#if revealed}
-            <EyeOff size={16} />
-          {:else}
-            <Eye size={16} />
-          {/if}
-        </button>
+        <div class="tooltip tooltip-bottom">
+          <button
+            class="btn btn-circle btn-sm bg-white/20 border-none text-secondary-content hover:bg-white/30"
+            aria-label={revealed ? "Hide secret key" : "Reveal secret key"}
+            aria-describedby="show-secret-key-tooltip"
+            aria-pressed={revealed}
+            onclick={() => (revealed = !revealed)}
+          >
+            {#if revealed}
+              <EyeOff size={16} />
+            {:else}
+              <Eye size={16} />
+            {/if}
+          </button>
+          <span
+            id="show-secret-key-tooltip"
+            class="tooltip-content"
+            role="tooltip"
+          >
+            {revealed ? "Hide secret key" : "Reveal secret key"}
+          </span>
+        </div>
       </div>
     </div>
     <div class="p-4">

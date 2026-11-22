@@ -11,7 +11,7 @@
 
   let { handleViewChange, currentView }: Props = $props();
 
-  let showBack = $derived(
+  let showBack = $derived.by(
     () =>
       currentView === "setup-method" ||
       currentView === "setup-qrcode" ||
@@ -46,14 +46,20 @@
 >
   <div class="relative flex items-center justify-between px-4 h-14">
     <div class="flex items-center gap-2">
-      {#if showBack()}
-        <button
-          class="btn btn-ghost btn-md btn-square rounded-2xl transition-transform duration-200 hover:scale-105 active:scale-65"
-          onclick={handleBack}
-          aria-label="Go back"
-        >
-          <ChevronRight size={18} class="rotate-180" />
-        </button>
+      {#if showBack}
+        <div class="tooltip tooltip-bottom">
+          <button
+            class="btn btn-ghost btn-md btn-square rounded-2xl transition-transform duration-200 hover:scale-105 active:scale-65"
+            onclick={handleBack}
+            aria-label="Go back"
+            aria-describedby="appbar-back-tooltip"
+          >
+            <ChevronRight size={18} class="rotate-180" />
+          </button>
+          <span id="appbar-back-tooltip" class="tooltip-content" role="tooltip">
+            Go back
+          </span>
+        </div>
       {/if}
     </div>
 

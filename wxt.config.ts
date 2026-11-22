@@ -11,6 +11,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
+    name: 'Authmatic',
+    description: 'A secure one-time password authenticator for Neptun.',
+    version: '1.0.0',
     permissions: ['storage', 'downloads'],
   },
 });

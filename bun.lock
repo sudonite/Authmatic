@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "wxt-svelte-starter",
+      "name": "authmatic",
       "devDependencies": {
         "@lucide/svelte": "^1.58.0",
         "@number-flow/svelte": "^0.4.2",
